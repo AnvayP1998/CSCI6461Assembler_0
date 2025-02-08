@@ -72,11 +72,10 @@ public class Assembler {
                     int r = 0, ix = 0, i = 0, mem = 0;
 
                     try {
-if (parts[0].equals("HLT")) {  // Special case for HLT (No operands)
-    writer.write(String.format("%06o %06o %s\n", locationCounter, 0, "HLT"));
-    locationCounter++;  // Increment the location counter
-    continue;  // Skip further processing for this line
-
+                        if (parts[0].equals("HLT")) {  // Special case for HLT (No operands)
+                            writer.write(String.format("%06o %06o %s\n", locationCounter, 0, "HLT"));
+                            locationCounter++;  // Increment the location counter
+                            continue;  // Skip further processing for this line
                         }
 
                         // Handle operands only if not HLT
@@ -86,11 +85,12 @@ if (parts[0].equals("HLT")) {  // Special case for HLT (No operands)
                         if (operands.length == 4) i = Integer.parseInt(operands[3]);
 
                         // Operand validation (ensure they are in valid ranges)
-                    if (r < 0 || r > 3 || ix < 0 || ix > 3 || i < 0 || i > 1 || mem < 0 || mem > 1023) {
-                        throw new IllegalArgumentException("Operand out of range: r=" + r + ", ix=" + ix + ", i=" + i + ", mem=" + mem);
-                    }
+                        if (r < 0 || r > 3 || ix < 0 || ix > 3 || i < 0 || i > 1 || mem < 0 || mem > 1023) {
+                            throw new IllegalArgumentException("Operand out of range: r=" + r + ", ix=" + ix + ", i=" + i + ", mem=" + mem);
+                        }
 
-                    int hexInstruction = (opcodeValue << 12) | (r << 10) | (ix << 8) | (i << 7) | mem;
+                        // Encoding instruction
+                        int hexInstruction = (opcodeValue << 12) | (r << 10) | (ix << 8) | (i << 7) | mem;
 
                         writer.write(String.format("%06o %06o %s\n", locationCounter, hexInstruction, line));
                         locationCounter++;  // Increment the location counter after processing the instruction
@@ -117,8 +117,7 @@ if (parts[0].equals("HLT")) {  // Special case for HLT (No operands)
         opcodes.put("JCC", 0x12);  // Jump Conditional (opcode 12)
         opcodes.put("IN", 0x61);   // Input (opcode 61)
         opcodes.put("OUT", 0x62);  // Output (opcode 62)
-    
+
         return opcodes.getOrDefault(opcode, 0);  // Default to 0 if opcode not found
     }   
-    
 }
