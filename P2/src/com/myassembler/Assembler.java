@@ -50,7 +50,7 @@ public class Assembler {
 
                 if (parts[0].equals("LOC")) {  // Set location counter
                     locationCounter = Integer.parseInt(parts[1], 16);
-                    writer.write("LOC " + parts[1] + "\n");
+                    writer.write(String.format("%06o %06o LOC %s\n", locationCounter, 0, parts[1]));
                 } else if (parts[0].equals("Data")) {  // Data handling
                     int value;
                     if (labels.containsKey(parts[1])) {
@@ -79,15 +79,10 @@ public class Assembler {
                         }
 
                         // Handle operands only if not HLT
-                        if (operands.length >= 1) r = Integer.parseInt(operands[0]);
-                        if (operands.length >= 2) ix = Integer.parseInt(operands[1]);
-                        if (operands.length >= 3) mem = Integer.parseInt(operands[2]);
-                        if (operands.length == 4) i = Integer.parseInt(operands[3]);
-
-                        // Operand validation (ensure they are in valid ranges)
-                        if (r < 0 || r > 3 || ix < 0 || ix > 3 || i < 0 || i > 1 || mem < 0 || mem > 1023) {
-                            throw new IllegalArgumentException("Operand out of range: r=" + r + ", ix=" + ix + ", i=" + i + ", mem=" + mem);
-                        }
+                        if (operands.length >= 1) r = parseOperand(operands[0], "r", 0, 3);
+                        if (operands.length >= 2) ix = parseOperand(operands[1], "ix", 0, 3);
+                        if (operands.length >= 3) mem = parseOperand(operands[2], "mem", 0, 1023);
+                        if (operands.length == 4) i = parseOperand(operands[3], "i", 0, 1);
 
                         // Encoding instruction
                         int hexInstruction = (opcodeValue << 12) | (r << 10) | (ix << 8) | (i << 7) | mem;
@@ -119,5 +114,17 @@ public class Assembler {
         opcodes.put("OUT", 0x62);  // Output (opcode 62)
 
         return opcodes.getOrDefault(opcode, 0);  // Default to 0 if opcode not found
-    }   
+    }
+
+    private static int parseOperand(String operand, String type, int min, int max) {
+        try {
+            int value = Integer.parseInt(operand);
+            if (value < min || value > max) {
+                throw new IllegalArgumentException(type + " operand out of range: " + operand);
+            }
+            return value;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid " + type + " operand: " + operand);
+        }
+    }
 }
