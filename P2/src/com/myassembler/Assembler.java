@@ -49,8 +49,7 @@ public class Assembler {
                 String[] parts = line.split("\\s+");
 
                 if (parts[0].equals("LOC")) {  // Set location counter
-                    locationCounter = Integer.parseInt(parts[1], 16);
-                    writer.write(String.format("%06o %06o LOC %s\n", locationCounter, 0, parts[1]));
+                    locationCounter = Integer.parseInt(parts[1], 16);  // No output for LOC
                 } else if (parts[0].equals("Data")) {  // Data handling
                     int value;
                     if (labels.containsKey(parts[1])) {
@@ -62,38 +61,39 @@ public class Assembler {
                             throw new IllegalArgumentException("Invalid data or label: " + parts[1]);
                         }
                     }
-                    writer.write(String.format("%06o %06o Data %s%n", locationCounter, value, parts[1]));
-                    locationCounter++;
+                    writer.write(String.format("%06o %06o\n", locationCounter, value));  // Output only location and value
+                    locationCounter++;  // Increment location counter after Data
                 } else {  // Instructions
                     int opcodeValue = getOpcodeValue(parts[0]);
                     String[] operands = parts.length > 1 ? parts[1].split(",") : new String[0];
-
+                
                     // Operand initialization
                     int r = 0, ix = 0, i = 0, mem = 0;
-
+                
                     try {
                         if (parts[0].equals("HLT")) {  // Special case for HLT (No operands)
-                            writer.write(String.format("%06o %06o %s\n", locationCounter, 0, "HLT"));
+                            writer.write(String.format("%06o %06o\n", locationCounter, 0));  // Only location and machine code
                             locationCounter++;  // Increment the location counter
                             continue;  // Skip further processing for this line
                         }
-
+                
                         // Handle operands only if not HLT
                         if (operands.length >= 1) r = parseOperand(operands[0], "r", 0, 3);
                         if (operands.length >= 2) ix = parseOperand(operands[1], "ix", 0, 3);
                         if (operands.length >= 3) mem = parseOperand(operands[2], "mem", 0, 1023);
                         if (operands.length == 4) i = parseOperand(operands[3], "i", 0, 1);
-
+                
                         // Encoding instruction
                         int hexInstruction = (opcodeValue << 12) | (r << 10) | (ix << 8) | (i << 7) | mem;
-
-                        writer.write(String.format("%06o %06o %s\n", locationCounter, hexInstruction, line));
+                
+                        // Write location and machine code only (no instruction text)
+                        writer.write(String.format("%06o %06o\n", locationCounter, hexInstruction));
                         locationCounter++;  // Increment the location counter after processing the instruction
                     } catch (Exception e) {
                         // Catch errors and print them in the output
                         writer.write(String.format("%06o Error: %s\n", locationCounter, e.getMessage()));
                     }
-                }
+                }    
             }
         } catch (IOException e) {
             e.printStackTrace();
