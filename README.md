@@ -1,4 +1,4 @@
-# Project2-CSCI6461-Grp12
+# Project2-CSCI6461-Team 8
 
 # CSCI 6461 Assembler
 
