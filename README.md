@@ -20,8 +20,6 @@ This repository contains an **Assembler** implementation for the **CSCI 6461 Com
 |-- src/
 |   |-- com/myassembler/
 |   |   |-- Assembler.java
-|   |   |-- OpcodeTable.java
-|   |   |-- FileHandler.java
 |-- resources/
 |   |-- input (Sample Assembly Code)
 |   |-- output (Generated Machine Code)
