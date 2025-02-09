@@ -40,7 +40,7 @@ javac com/myassembler/Assembler.java
 ### Execution
 Run the assembler with:
 ```bash
-java -jar Assembler.jar
+java Assembler.java
 ```
 
 ## Input Format
